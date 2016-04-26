@@ -1,12 +1,21 @@
 package com.sabahtalateh;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 
 public class Main {
 
-    public static void main(String[] args) {
-        int k = 8;
-        int n = 6;
+    public static void main(String[] args) throws IOException {
+
+//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//        String s = br.readLine();
+
+//        int k = Integer.parseInt(s.split("\\s+")[0]);
+        int k = 4;
+//        int n = Integer.parseInt(s.split("\\s+")[1]);
+        int n = 4;
 
         int[] set = new int[k];
         for (int i = 0; i < k; i++) {
@@ -46,12 +55,16 @@ public class Main {
             leftInSet[i] = set[i];
         }
 
+        int count = 0;
+
         while (true) {
             if (done(set, a)) {
                 printArray(a);
                 break;
             }
             printArray(a);
+//            count++;
+//            System.out.println(count);
             if (boundReached(a, bound)) {
                 int boundReachedIndex = boundReachedIndex(maxValues, a, bound);
                 a = reformArray(set, a, boundReachedIndex, maxValues);
