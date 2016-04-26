@@ -5,8 +5,8 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String[] args) {
-        int k = 5;
-        int n = 4;
+        int k = 8;
+        int n = 6;
 
         int[] set = new int[k];
         for (int i = 0; i < k; i++) {
@@ -17,10 +17,6 @@ public class Main {
         for (int i = 0; i < n; i++) {
             a[i] = i;
         }
-//        a[0] = 4;
-//        a[1] = 3;
-//        a[2] = 0;
-//        a[3] = 1;
         int bound = bound(set, a);
 
         int[] maxValues = new int[n];
@@ -29,24 +25,20 @@ public class Main {
         }
 
 
-//        set = new int[5];
-//        set[0] = 0;
-//        set[1] = 1;
-//        set[2] = 2;
-//        set[3] = 3;
-//        set[4] = 4;
-//
-//        a = new int[4];
-//        a[0] = 4;
-//        a[1] = 0;
-//        a[2] = 2;
+//        a = new int[5];
+//        a[0] = 5;
+//        a[1] = 4;
+//        a[2] = 0;
 //        a[3] = 3;
-//
-//        bound = 2;
-//        int ind = boundReachedIndex(a, bound);
+//        a[4] = 1;
+
+//        bound = bound(set, a);
+////
+//        bound = 3;
+//        int ind = boundReachedIndex(maxValues, a, bound);
 //
 //        a = reformArray(set, a, ind);
-//
+////
 //        int u = 1 + 2;
 
         int[] leftInSet = new int[set.length];
@@ -62,19 +54,13 @@ public class Main {
             printArray(a);
             if (boundReached(a, bound)) {
                 int boundReachedIndex = boundReachedIndex(maxValues, a, bound);
-                a = reformArray(set, a, boundReachedIndex);
+                a = reformArray(set, a, boundReachedIndex, maxValues);
                 bound = bound(set, a);
                 for (int i = 0; i < leftInSet.length; i++) {
                     leftInSet[i] = set[i];
                 }
 
             } else {
-//                if ((a[a.length - 1] + 1) == (a[a.length - 2])) {
-//                    a[a.length - 1] += 2;
-//                } else {
-//                    a[a.length - 1] += 1;
-//                }
-
                 for (int i = 0; i < set.length; i++) {
                     for (int j = 0; j < a.length; j++) {
                         if (set[i] == a[j]) {
@@ -82,7 +68,6 @@ public class Main {
                         }
                     }
                 }
-
 
                 int increased = -1;
                 for (int i = 0; i < leftInSet.length; i++) {
@@ -92,13 +77,6 @@ public class Main {
                     }
                 }
                 a[a.length - 1] = increased;
-
-//                if (!arrayContains(a, increased)) {
-//                    a[a.length - 1] = increased;
-//                } else {
-//                    a[a.length - 1] = increasedValue(set, a);
-//                }
-//                a[a.length - 1]++;
             }
         }
     }
@@ -125,39 +103,26 @@ public class Main {
         return leftInSet[0];
     }
 
-    public static int increaseForPosition(int[] set, int[] previousArr, int[] arr, int position) {
-//        int leftInSetLength = set.length;
-//        for (int i = 0; i < set.length; i++) {
-//            for (int j = 0; j < previousArr.length; j++) {
-//                if (set[i] == previousArr[j] || set[i] == arr[j]) {
-//                    leftInSetLength -= 1;
-//                }
-//            }
-//        }
-//
-//        int[] leftInSet = new int[leftInSetLength];
-//        int leftInSetCount = 0;
-//        for (int i = 0; i < set.length; i++) {
-//            boolean contains = false;
-//            for (int j = 0; j < previousArr.length; j++) {
-//                if (set[i] == previousArr[j] || set[i] == arr[j]) {
-//                    contains = true;
-//                }
-//            }
-//            if (!contains) {
-//                leftInSet[leftInSetCount] = set[i];
-//                leftInSetCount++;
-//            }
-//        }
-
-
+    public static int increaseForPosition(int[] set, int[] previousArr, int[] arr, int position, int[] maxValues) {
         int maxInSet = set[set.length - 1];
         int max = arr[0];
+
+        int maxValsToPosition = 0;
+
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != maxValues[i]) {
+                break;
+            } else {
+                maxValsToPosition++;
+            }
+        }
+        max = arr[maxValsToPosition];
+
         if (max == maxInSet) {
             max = arr[1];
         }
         for (int i = 0; i < position + 1; i++) {
-            if (arr[i] == maxInSet) continue;
+            if (i < maxValsToPosition) continue;
             if (arr[i] > max) {
                 max = arr[i];
             }
@@ -166,7 +131,7 @@ public class Main {
         return max + 1;
     }
 
-    public static int[] reformArray(int[] set, int arr[], int boundReachedIndex) {
+    public static int[] reformArray(int[] set, int arr[], int boundReachedIndex, int[] maxValues) {
         int indexToIncrease = boundReachedIndex - 1;
         int[] result = new int[arr.length];
 
@@ -178,7 +143,7 @@ public class Main {
             if (indexToIncrease == i) {
                 int increased = arr[i] + 1;
                 if (arrayContains(result, increased)) {
-                    result[i] = increaseForPosition(set, arr, result, indexToIncrease);
+                    result[i] = increaseForPosition(set, arr, result, indexToIncrease, maxValues);
                 } else {
                     result[i] = increased;
                 }
@@ -234,17 +199,6 @@ public class Main {
         return contains;
     }
 
-    public static int maxInArray(int[] arr) {
-        int max = arr[0];
-        for (int anArr : arr) {
-            if (anArr > max) {
-                max = anArr;
-            }
-        }
-
-        return max;
-    }
-
     public static int boundReachedIndex(int[] maxValues, int arr[], int bound) {
         int[] arrCp = Arrays.copyOfRange(arr, 0, arr.length);
 
@@ -272,14 +226,6 @@ public class Main {
         }
 
         return maxIndex;
-//
-//        return maxIndex;
-//        for (int i = 0; i < arr.length; i++) {
-//            if (arr[i] == bound) {
-//                return i;
-//            }
-//        }
-//        return -1;
     }
 
     public static boolean boundReached(int[] arr, int bound) {
@@ -300,6 +246,10 @@ public class Main {
     public static int bound(int[] set, int[] arr) {
         int[] boundsSet = new int[set.length - arr.length];
 
+        if (set.length == arr.length) {
+            return arr[arr.length - 1];
+        }
+
         int boundCount = 0;
         for (int i : set) {
             boolean contains = false;
@@ -316,6 +266,17 @@ public class Main {
         }
 
         return boundsSet[boundCount - 1];
+    }
+
+    public static int maxInArray(int[] arr) {
+        int max = arr[0];
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+
+        return max;
     }
 
     public static void printArray(int[] arr) {
