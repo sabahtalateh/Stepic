@@ -11,6 +11,7 @@ public class MainKeqN {
             set[i] = i;
         }
 
+
 //        set[0] = 0;
 //        set[1] = 1;
 //        set[2] = 2;
