@@ -1,87 +1,67 @@
 package com.sabahtalateh;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        int vertexNumber = 6;
-        int edgesNumber = 10;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        TreeMap<Integer, ArrayList<Integer>> adjList = new TreeMap<Integer, ArrayList<Integer>>() {{
-            put(1, new ArrayList<Integer>() {{
-                add(1);
-                add(2);
-                add(4);
-            }});
+        String s = reader.readLine();
 
-            put(2, new ArrayList<Integer>() {{
-                add(2);
-                add(1);
-                add(4);
-                add(6);
-                add(3);
-            }});
+        int vertexNumber = Integer.parseInt(s.split(" ")[0]);
+        int edgesNumber = Integer.parseInt(s.split(" ")[1]);
 
-            put(3, new ArrayList<Integer>() {{
-                add(3);
-                add(2);
-                add(5);
-            }});
+        TreeMap<Integer, ArrayList<Integer>> adjList = new TreeMap<>();
 
-            put(4, new ArrayList<Integer>() {{
-                add(4);
-                add(1);
-                add(2);
-                add(6);
-                add(5);
-            }});
+        int[][] edges = new int[edgesNumber][2];
 
-            put(5, new ArrayList<Integer>() {{
-                add(5);
-                add(4);
-                add(3);
-            }});
+        for (int i = 0; i < vertexNumber; i++) {
+            ArrayList<Integer> linkToSelf = new ArrayList<>();
+            linkToSelf.add(i + 1);
+            adjList.put(i + 1, linkToSelf);
+        }
 
-            put(6, new ArrayList<Integer>() {{
-                add(6);
-                add(2);
-                add(4);
-            }});
+        int edgeCounter = 0;
 
-        }};
+        for (int i = 0; i < edgesNumber; i++) {
+            s = reader.readLine();
+
+            int from = Integer.parseInt(s.split(" ")[0]);
+            int to = Integer.parseInt(s.split(" ")[1]);
+
+            ArrayList<Integer> vertsToAddTo = adjList.get(from);
+            if (!vertsToAddTo.contains(to)) {
+                vertsToAddTo.add(to);
+            }
+
+            ArrayList<Integer> vertsToAddFrom = adjList.get(to);
+            if (!vertsToAddFrom.contains(from)) {
+                vertsToAddFrom.add(from);
+            }
+
+            edges[edgeCounter][0] = from;
+            edges[edgeCounter][1] = to;
+
+            edgeCounter++;
+        }
 
         if (getRelationComponents(adjList) != 1) {
             System.out.println("NONE");
             return;
         }
 
-        int[][] edges = new int[edgesNumber][2];
-
-        edges[0][0] = 1; edges[0][1] = 2;
-        edges[1][0] = 1; edges[1][1] = 4;
-        edges[2][0] = 2; edges[2][1] = 4;
-        edges[3][0] = 2; edges[3][1] = 6;
-        edges[4][0] = 4; edges[4][1] = 6;
-        edges[5][0] = 4; edges[5][1] = 5;
-        edges[6][0] = 5; edges[6][1] = 3;
-        edges[7][0] = 2; edges[7][1] = 3;
-        edges[7][0] = 2; edges[7][1] = 3;
-        edges[8][0] = 1; edges[8][1] = 2;
-        edges[9][0] = 1; edges[9][1] = 2;
-
         int[] vertexEdgesCount = new int[vertexNumber];
 
         for (int[] edge : edges) {
             for (int vertex : edge) {
                 vertexEdgesCount[vertex - 1]++;
-                System.out.print(vertex + " ");
             }
-            System.out.println();
         }
-
-        System.out.println(Arrays.toString(vertexEdgesCount));
 
         for (int edgeCount : vertexEdgesCount) {
             if (edgeCount % 2 != 0) {
@@ -89,6 +69,69 @@ public class Main {
                 return;
             }
         }
+
+        LinkedList<Integer> stack = new LinkedList<>();
+        stack.add(1);
+
+
+        while (stack.size() != 0) {
+
+            int currVert = stack.getLast();
+
+            int[][] edgeToRemove = getFirstEdgeContainsVertexIndexes(edges, currVert);
+
+            if (edgeToRemove[0][0] == -1) {
+                break;
+            } else {
+                if (edges[edgeToRemove[0][0]][edgeToRemove[0][1]] == currVert) {
+                    stack.add(edges[edgeToRemove[1][0]][edgeToRemove[1][1]]);
+                } else {
+                    stack.add(edges[edgeToRemove[0][0]][edgeToRemove[0][1]]);
+                }
+
+                removeEdge(edges, edgeToRemove);
+            }
+        }
+
+        int c = stack.size();
+
+        for (Integer aStack : stack) {
+            c--;
+            if (c != 0) System.out.print(aStack + " ");
+        }
+    }
+
+    private static int[][] getFirstEdgeContainsVertexIndexes(int[][] edges, int vertex) {
+        int[][] out = new int[2][2];
+        out[0][0] = -1;
+        out[0][1] = -1;
+        out[1][0] = -1;
+        out[1][1] = -1;
+
+        label:
+        for (int i = 0; i < edges.length; i++) {
+            for (int j = 0; j < edges[i].length; j++) {
+                if (edges[i][j] == vertex) {
+
+                    out[0][0] = i;
+                    out[0][1] = 0;
+
+                    out[1][0] = i;
+                    out[1][1] = 1;
+
+                    break label;
+                }
+            }
+        }
+
+        return out;
+    }
+
+    private static int[][] removeEdge(int[][] edges, int[][] edgeToRemove) {
+        edges[edgeToRemove[0][0]][edgeToRemove[0][1]] = -1;
+        edges[edgeToRemove[1][0]][edgeToRemove[1][1]] = -1;
+
+        return edges;
     }
 
     private static int getRelationComponents(TreeMap<Integer, ArrayList<Integer>> adjList) {
