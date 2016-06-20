@@ -73,6 +73,7 @@ public class Main {
         LinkedList<Integer> stack = new LinkedList<>();
         stack.add(1);
 
+        ArrayList<Integer> answear = new ArrayList<>();
 
         while (stack.size() != 0) {
 
@@ -81,7 +82,8 @@ public class Main {
             int[][] edgeToRemove = getFirstEdgeContainsVertexIndexes(edges, currVert);
 
             if (edgeToRemove[0][0] == -1) {
-                break;
+                answear.add(stack.getLast());
+                stack.removeLast();
             } else {
                 if (edges[edgeToRemove[0][0]][edgeToRemove[0][1]] == currVert) {
                     stack.add(edges[edgeToRemove[1][0]][edgeToRemove[1][1]]);
@@ -93,9 +95,9 @@ public class Main {
             }
         }
 
-        int c = stack.size();
+        int c = answear.size();
 
-        for (Integer aStack : stack) {
+        for (Integer aStack : answear) {
             c--;
             if (c != 0) System.out.print(aStack + " ");
         }
