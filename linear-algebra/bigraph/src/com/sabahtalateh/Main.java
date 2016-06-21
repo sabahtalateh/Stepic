@@ -81,7 +81,7 @@ public class Main {
             put(1, new ArrayList<Integer>() {{
                 add(1);
                 add(2);
-                add(4);
+                add(5);
             }});
             put(2, new ArrayList<Integer>() {{
                 add(2);
@@ -92,14 +92,28 @@ public class Main {
                 add(3);
                 add(2);
                 add(4);
+                add(7);
             }});
             put(4, new ArrayList<Integer>() {{
                 add(4);
                 add(3);
-                add(1);
+                add(5);
+                add(6);
             }});
             put(5, new ArrayList<Integer>() {{
                 add(5);
+                add(1);
+                add(4);
+            }});
+            put(6, new ArrayList<Integer>() {{
+                add(6);
+                add(4);
+                add(7);
+            }});
+            put(7, new ArrayList<Integer>() {{
+                add(7);
+                add(6);
+                add(3);
             }});
         }};
 
@@ -120,32 +134,35 @@ public class Main {
             }
         }
 
-        TreeMap<Integer, String> vertexesToFind = new TreeMap<>();
-        int[] prevAndCurr = new int[2];
+        TreeMap<Integer, Integer> vertexesToFind = new TreeMap<>();
+//        int[] prevAndCurr = new int[2];
 
         int components = 0;
         while (hasUnmarkedInWholeGraph(marks)) {
-            prevAndCurr[0] = -1;
-            prevAndCurr[1] = -1;
+
+            Integer distance = 0;
+
+//            prevAndCurr[0] = -1;
+//            prevAndCurr[1] = -1;
 
             components++;
             int firstUnmarked = getFirstUnmarkedInWholeGraph(marks);
-            vertexesToFind.put(firstUnmarked, "red");
+            vertexesToFind.put(firstUnmarked, distance);
 
             while (true) {
 
-                Map.Entry<Integer, String> lastVertex = vertexesToFind.lastEntry();
-                vertexesToFind.remove(vertexesToFind.lastEntry().getKey());
-                markVertexAsVisited(lastVertex.getKey(), marks, lastVertex.getValue());
+                Map.Entry<Integer, Integer> firstVertex = vertexesToFind.firstEntry();
+                vertexesToFind.remove(vertexesToFind.firstEntry().getKey());
+                markVertexAsVisited(firstVertex.getKey(), marks, firstVertex.getValue());
 
-                fillVertexToFind(adjList, lastVertex.getKey(), vertexesToFind, marks, lastVertex.getValue());
+                distance = fillVertexToFind(adjList, firstVertex.getKey(), vertexesToFind, marks, distance);
 
-                prevAndCurr[0] = prevAndCurr[1];
-                prevAndCurr[1] = lastVertex.getKey();
-
-                if ((prevAndCurr[0] != prevAndCurr[1]) && (prevAndCurr[0] != -1 && prevAndCurr[1] != -1)) {
-                    removeFromEdgesLeft(edgesLeft, prevAndCurr[0], prevAndCurr[1]);
-                }
+//                prevAndCurr[0] = prevAndCurr[1];
+//                prevAndCurr[1] = lastVertex.getKey();
+//
+//                if ((prevAndCurr[0] != prevAndCurr[1]) && (prevAndCurr[0] != -1 && prevAndCurr[1] != -1)) {
+//                    removeFromEdgesLeft(edgesLeft, prevAndCurr[0], prevAndCurr[1]);
+//                }
 
                 if (hasVertexesToFind(vertexesToFind)) {
                     continue;
@@ -215,43 +232,34 @@ public class Main {
         return false;
     }
 
-    private static void fillVertexToFind(
+    private static int fillVertexToFind(
             TreeMap<Integer, ArrayList<Integer>> adjList,
             int vertexIndex,
-            TreeMap<Integer, String> vertexesToFind,
+            TreeMap<Integer, Integer> vertexesToFind,
             TreeMap<Integer, String> marks,
-            String lastVertexColor
+            int distance
     ) {
         for (Integer vertex : adjList.get(vertexIndex)) {
-            if (marks.get(vertex).equals("")) {
-                if (!vertexesToFind.containsKey(vertex)) {
-                    String color;
-                    if (lastVertexColor.equals("red")) {
-                        color = "black";
-                    } else {
-                        color = "red";
-                    }
-
-                    vertexesToFind.put(vertex, color);
-                } else {
-//                    String color;
-//                    if (vertexesToFind.get(vertex).equals("red")) {
-//                        color = "black";
-//                    } else {
-//                        color = "red";
-//                    }
-//
-//                    vertexesToFind.put(vertex, color);
-                }
+            if (marks.get(vertex).equals("") && !vertexesToFind.containsKey(vertex)) {
+                distance = distance + 1;
+                break;
             }
         }
+
+        for (Integer vertex : adjList.get(vertexIndex)) {
+            if (marks.get(vertex).equals("") && !vertexesToFind.containsKey(vertex)) {
+                vertexesToFind.put(vertex, distance);
+            }
+        }
+
+        return distance;
     }
 
-    private static void markVertexAsVisited(int idx, TreeMap<Integer, String> marks, String color) {
-        marks.put(idx, color);
+    private static void markVertexAsVisited(int idx, TreeMap<Integer, String> marks, int distance) {
+        marks.put(idx, String.valueOf(distance));
     }
 
-    private static boolean hasVertexesToFind(TreeMap<Integer, String> vertexesToFind) {
+    private static boolean hasVertexesToFind(TreeMap<Integer, Integer> vertexesToFind) {
         return vertexesToFind.size() != 0;
     }
 
