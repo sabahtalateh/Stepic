@@ -81,40 +81,53 @@ public class Main {
             put(1, new ArrayList<Integer>() {{
                 add(1);
                 add(2);
-                add(5);
+                add(3);
             }});
             put(2, new ArrayList<Integer>() {{
                 add(2);
                 add(1);
-                add(3);
+                add(4);
             }});
             put(3, new ArrayList<Integer>() {{
                 add(3);
-                add(2);
+                add(1);
                 add(4);
-                add(7);
             }});
             put(4, new ArrayList<Integer>() {{
                 add(4);
+                add(2);
                 add(3);
                 add(5);
                 add(6);
             }});
             put(5, new ArrayList<Integer>() {{
                 add(5);
-                add(1);
                 add(4);
+                add(6);
             }});
             put(6, new ArrayList<Integer>() {{
                 add(6);
                 add(4);
-                add(7);
+                add(5);
             }});
-            put(7, new ArrayList<Integer>() {{
-                add(7);
-                add(6);
-                add(3);
-            }});
+//            put(7, new ArrayList<Integer>() {{
+//                add(7);
+//                add(3);
+//                add(8);
+//            }});
+//            put(8, new ArrayList<Integer>() {{
+//                add(8);
+//                add(7);
+//                add(9);
+//            }});
+//            put(9, new ArrayList<Integer>() {{
+//                add(9);
+//                add(8);
+//            }});
+//
+//            put(10, new ArrayList<Integer>() {{
+//                add(10);
+//            }});
         }};
 
         TreeMap<Integer, String> marks = new TreeMap<>();
@@ -133,6 +146,9 @@ public class Main {
                 }
             }
         }
+
+        TreeMap<Integer, Integer> passed = new TreeMap<>();
+
 
         TreeMap<Integer, Integer> vertexesToFind = new TreeMap<>();
 //        int[] prevAndCurr = new int[2];
@@ -155,7 +171,7 @@ public class Main {
                 vertexesToFind.remove(vertexesToFind.firstEntry().getKey());
                 markVertexAsVisited(firstVertex.getKey(), marks, firstVertex.getValue());
 
-                distance = fillVertexToFind(adjList, firstVertex.getKey(), vertexesToFind, marks, distance);
+                distance = fillVertexToFind(adjList, firstVertex.getKey(), vertexesToFind, marks, firstVertex.getValue(), passed);
 
 //                prevAndCurr[0] = prevAndCurr[1];
 //                prevAndCurr[1] = lastVertex.getKey();
@@ -237,7 +253,8 @@ public class Main {
             int vertexIndex,
             TreeMap<Integer, Integer> vertexesToFind,
             TreeMap<Integer, String> marks,
-            int distance
+            int distance,
+            TreeMap<Integer, Integer> passed
     ) {
         for (Integer vertex : adjList.get(vertexIndex)) {
             if (marks.get(vertex).equals("") && !vertexesToFind.containsKey(vertex)) {
@@ -249,6 +266,7 @@ public class Main {
         for (Integer vertex : adjList.get(vertexIndex)) {
             if (marks.get(vertex).equals("") && !vertexesToFind.containsKey(vertex)) {
                 vertexesToFind.put(vertex, distance);
+                passed.put(vertexIndex, vertex);
             }
         }
 
@@ -256,7 +274,13 @@ public class Main {
     }
 
     private static void markVertexAsVisited(int idx, TreeMap<Integer, String> marks, int distance) {
-        marks.put(idx, String.valueOf(distance));
+        String color;
+        if (distance % 2 == 0) {
+            color = "black";
+        } else {
+            color = "white";
+        }
+        marks.put(idx, String.valueOf(color));
     }
 
     private static boolean hasVertexesToFind(TreeMap<Integer, Integer> vertexesToFind) {
